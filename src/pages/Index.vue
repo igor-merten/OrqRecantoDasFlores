@@ -1,78 +1,82 @@
 <template>
   <q-page padding>
-    <div class="row">
-      <div class="col row notification noNotification" v-if="notificationsInDay == 0">
-        <p class="col-4 iconNotification">
-          <img src="../statics/flower.png">
-        </p>
-        <div class="col-8">
-          <p class="titleNotification">Parabéns!</p>
-          <p class="captionNotification">
-            Você está seguindo as recomendações de cuidado de forma exemplar! Suas plantas agradecem.
-            <q-icon name="eco"></q-icon>
-          </p>
-        </div>
-      </div>
-      <div class="col notification pendingNotification" v-else>
-        <div class="row" style="margin-bottom: 5px">
+    <div>
+      <div class="row">
+        <div class="col row notification noNotification" v-if="notificationsInDay == 0">
           <p class="col-4 iconNotification">
-            <img src="../statics/sadplant.png">
+            <img src="../statics/flower.png">
           </p>
           <div class="col-8">
-            <p class="titleNotification">Deu ruim!</p>
+            <p class="titleNotification">Parabéns!</p>
             <p class="captionNotification">
-              Você tem algumas notificações pendentes. Confira:
+              Você está seguindo as recomendações de cuidado de forma exemplar! Suas plantas agradecem.
+              <q-icon name="eco"></q-icon>
             </p>
           </div>
         </div>
-        <div class="row"
-          v-for="notification in this.allNotificationsDay()"
-          :key="notification.id"
-          v-bind="notification">
-          <NextAction class="currentNotifications"
-            v-bind="notification"
-          >
-          </NextAction>
+        <div class="col notification pendingNotification" v-else>
+          <div class="row" style="margin-bottom: 5px">
+            <p class="col-4 iconNotification">
+              <img src="../statics/sadplant.png">
+            </p>
+            <div class="col-8">
+              <p class="titleNotification">Deu ruim!</p>
+              <p class="captionNotification">
+                Você tem algumas notificações pendentes. Confira:
+              </p>
+            </div>
+          </div>
+          <div class="row"
+            v-for="notification in this.allNotificationsDay()"
+            :key="notification.id"
+            v-bind="notification">
+            <NextAction class="currentNotifications"
+              v-bind="notification"
+              actionBtnIcon="done"
+            >
+            </NextAction>
+          </div>
         </div>
       </div>
+    <div>
     </div>
-  <div>
-  </div>
-    <q-card>
-      <q-card-section class="row">
-        <div class="col-12 text-h6">Proximas ações:</div>
-        <div class="cardsNextAction">
-          <NextAction
-            v-for="notification in this.nextAction()"
-            :key="notification.id"
-            v-bind="notification"
-          />
-          <div style="margin: 0px; padding: 0px" v-if="this.nextAction().length == 0">
-            <p style="margin-top: 10px; margin-bottom: 5px">
-              Você não possui nenhum lembrete cadastrado.
-            </p>
-            <p>
-              Deseja <a href="#">cadastrar um</a>?
-            </p>
+      <q-card>
+        <q-card-section class="row">
+          <div class="col-12 text-h6">Proximas ações:</div>
+          <div class="cardsNextAction">
+            <NextAction
+              v-for="notification in this.nextAction()"
+              :key="notification.id"
+              v-bind="notification"
+              actionBtn="Cancelar lembrete"
+              @click:actionBtn="alertar()"
+            />
+            <div style="margin: 0px; padding: 0px" v-if="this.nextAction().length == 0">
+              <p style="margin-top: 10px; margin-bottom: 5px">
+                Você não possui nenhum lembrete cadastrado.
+              </p>
+              <p>
+                Deseja <a href="#">cadastrar um</a>?
+              </p>
+            </div>
           </div>
-        </div>
-      </q-card-section>
-    </q-card>
+        </q-card-section>
+      </q-card>
+    </div>
     <!-- <button @click="setNotificationsLS()">teste</button> -->
   </q-page>
 </template>
 
 <script>
 import NextAction from 'components/NextAction'
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import lembretes from '../assets/lembretes.json'
+import AddNotificationModal from 'components/AddNotificationModal'
 import { LocalStorage } from 'quasar'
 
 export default {
   components: {
     NextAction,
     // eslint-disable-next-line vue/no-unused-components
-    lembretes
+    AddNotificationModal
   },
   data () {
     // var today = Date.now()
@@ -113,6 +117,12 @@ export default {
     },
 
     setNotificationsLS: function (value) {
+      value = {
+        id: 2,
+        title: 'Adubação',
+        caption: 'É preciso adubar as Cattleyas com Basacote.',
+        date: '26/05/2020'
+      }
       var key = 'notification'
       var allValues = this.getNotificationsLS()
       allValues.push(value)
@@ -125,6 +135,9 @@ export default {
       }
       // console.log(LocalStorage.getItem(key))
       return LocalStorage.getItem(key)
+    },
+    alertar: function () {
+      console.log('teste')
     }
   },
   mounted () {

@@ -13,11 +13,13 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",
+    "axios": "^0.19.2",
     "edit-json-file": "^1.4.0",
     "eslint": "^6.8.0",
     "file-saver": "^2.0.2",
     "filestream": "^5.0.0",
-    "quasar": "^1.0.0"
+    "quasar": "^1.0.0",
+    "vue-axios": "^2.1.5"
   },
   "devDependencies": {
     "@quasar/app": "^1.0.0",
