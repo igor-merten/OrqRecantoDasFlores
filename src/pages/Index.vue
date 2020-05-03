@@ -3,7 +3,6 @@
     <div class="row">
       <div class="col row notification noNotification" v-if="notificationsInDay == 0">
         <p class="col-4 iconNotification">
-          <!-- <q-icon class="iconNotification" name="sentiment_satisfied_alt" /> -->
           <img src="../statics/flower.png">
         </p>
         <div class="col-8">
@@ -14,151 +13,121 @@
           </p>
         </div>
       </div>
+      <div class="col notification pendingNotification" v-else>
+        <div class="row" style="margin-bottom: 5px">
+          <p class="col-4 iconNotification">
+            <img src="../statics/sadplant.png">
+          </p>
+          <div class="col-8">
+            <p class="titleNotification">Deu ruim!</p>
+            <p class="captionNotification">
+              Você tem algumas notificações pendentes. Confira:
+            </p>
+          </div>
+        </div>
+        <div class="row"
+          v-for="notification in this.allNotificationsDay()"
+          :key="notification.id"
+          v-bind="notification">
+          <NextAction class="currentNotifications"
+            v-bind="notification"
+          >
+          </NextAction>
+        </div>
+      </div>
     </div>
-
-  <q-card>
-    <q-card-section class="row">
-      <div class="col-12 text-h6">Proximas ações:</div>
-      <div class="row cardsNextAction">
-        <NextAction
-            v-for="notification in notifications"
+  <div>
+  </div>
+    <q-card>
+      <q-card-section class="row">
+        <div class="col-12 text-h6">Proximas ações:</div>
+        <div class="cardsNextAction">
+          <NextAction
+            v-for="notification in this.nextAction()"
             :key="notification.id"
             v-bind="notification"
           />
+          <div style="margin: 0px; padding: 0px" v-if="this.nextAction().length == 0">
+            <p style="margin-top: 10px; margin-bottom: 5px">
+              Você não possui nenhum lembrete cadastrado.
+            </p>
+            <p>
+              Deseja <a href="#">cadastrar um</a>?
+            </p>
+          </div>
         </div>
-    </q-card-section>
-  </q-card>
-
-    <!-- <div class="row">
-      <p class="col">Proximas ações:</p>
-    </div>
-    <div class="row">
-        <q-list class="col" bordered separator>
-        <NextAction
-          v-for="notification in notifications"
-          :key="notification.id"
-          v-bind="notification"
-        />
-        </q-list>
-      </div> -->
-    <!-- <button
-      style="position: absolute; right: 10px;"
-      @click="counter++"
-    >
-      {{counter}}
-    </button>
-
-    <div class="q-pa-md q-gutter-sm">
-      <q-avatar
-        v-for="size in ['xs', 'sm', 'md', 'lg', 'xl']"
-        :key="size"
-        :size="size"
-        color="primary"
-        text-color="white"
-        icon="directions"
-      />
-    </div>
-
-    <input
-      v-model="message"
-      type="text"
-      @keyup.esc="clearMessage"
-      @keyup.enter="alertMessage"
-      v-autofocus
-      :style="errorStyle"
-      ref="messageInput"
-      >
-      @mouseenter="alertMessage"
-    <button @click="clearMessage">Clear</button>
-    <h5
-      v-if="message.length"
-      class="border-grey">{{ message }}</h5>
-    <h6 v-else>No message entered</h6>
-
-    <hr>
-
-    <p>Uppercase message: {{ messageUppercase }}</p>
-    <p>Lowercase message: {{ message | messageLowercase }}</p> -->
+      </q-card-section>
+    </q-card>
+    <!-- <button @click="setNotificationsLS()">teste</button> -->
   </q-page>
 </template>
 
 <script>
 import NextAction from 'components/NextAction'
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import lembretes from '../assets/lembretes.json'
+import { LocalStorage } from 'quasar'
 
 export default {
   components: {
-    NextAction
+    NextAction,
+    // eslint-disable-next-line vue/no-unused-components
+    lembretes
   },
   data () {
+    // var today = Date.now()
+    // console.log(this.allNotificationsDay())
     return {
-      notificationsInDay: 0,
-      notifications: [
-        {
-          id: 1,
-          title: 'Rega',
-          caption: 'Você precisa molhar as plantas. porque elas podem morrer e esse texto ficou bem grande',
-          date: '13/05/2020'
-        },
-        {
-          id: 2,
-          title: 'Adubação',
-          caption: 'É preciso adubar as Cattleyas com Basacote.',
-          date: '20/05/2020'
-        },
-        {
-          id: 3,
-          title: 'Enraizar mudas',
-          caption: 'É preciso enraizar os dendrobiuns com Superdrive.',
-          date: '26/05/2020'
-        }
-      ]
+      notificationsInDay: this.allNotificationsDay().length
     }
   },
-  // computed: {
-  //   messageUppercase () {
-  //     console.log('Message Uppercase was fired.')
-  //     return this.message.toUpperCase()
-  //   },
-  //   errorStyle () {
-  //     if (this.message.length > 22) {
-  //       return {
-  //         color: 'red', background: 'pink'
-  //       }
-  //     }
-  //     return null
-  //   }
-  // },
-  // methods: {
-  //   clearMessage () {
-  //     console.log('a')
-  //     this.message = ''
-  //   },
-  //   handleKeyup (e) {
-  //     console.log(e)
-  //     if (e.keyCode === 32) {
-  //       this.clearMessage()
-  //     } else if (e.keyCode === 13) {
-  //       this.alertMessage()
-  //     }
-  //   },
-  //   alertMessage () {
-  //     alert(this.message)
-  //   }
-  // },
-  // filters: {
-  //   messageLowercase (value) {
-  //     return value.toLowerCase()
-  //   }
-  // },
-  // directives: {
-  //   autofocus: {
-  //     inserted (el) {
-  //       el.focus()
-  //     }
-  //   }
-  // },
+  methods: {
+    allNotificationsDay () {
+      var array = []
+      var notifications = this.getNotificationsLS()
+
+      for (var i = 0; i < notifications.length; i++) {
+        if (notifications[i].date === '26/05/2020') {
+          array.push(notifications[i])
+        }
+      }
+
+      return array
+    },
+
+    nextAction () {
+      var array = []
+      var notifications = this.getNotificationsLS()
+      // var loops = notifications.length < 3 ? notifications.length : 3
+
+      for (var i = 0; i < notifications.length; i++) {
+        if (notifications[i].date !== '26/05/2020') {
+          array.push(notifications[i])
+        }
+        if (i === 2) {
+          break
+        }
+      }
+
+      return array
+    },
+
+    setNotificationsLS: function (value) {
+      var key = 'notification'
+      var allValues = this.getNotificationsLS()
+      allValues.push(value)
+      LocalStorage.set(key, allValues)
+    },
+    getNotificationsLS: function () {
+      var key = 'notification'
+      if (!LocalStorage.getItem(key) || LocalStorage.getItem(key) == null) {
+        LocalStorage.set(key, [])
+      }
+      // console.log(LocalStorage.getItem(key))
+      return LocalStorage.getItem(key)
+    }
+  },
   mounted () {
-    // this.$refs.messageInput.className = 'bg-green'
   }
 }
 </script>
@@ -189,9 +158,14 @@ export default {
 }
 .notification .titleNotification{
   font-weight: bold;
-  color: #20943b;
   font-size: 20px;
   margin-bottom: 5px;
+}
+.notification.noNotification .titleNotification{
+  color: #20943b;
+}
+.notification.pendingNotification .titleNotification{
+  color: #c10015;
 }
 
 .noNotification{
@@ -199,15 +173,12 @@ export default {
   border-color: #21ba45;
 }
 
-/* .border-grey{
-  border: 1px solid grey;
+.pendingNotification{
+  background-color: #ffc0c6;
+  border-color: #c10015;
 }
-input, button {
-  font-size: 23px;
-}
-.error{
-  color: red;
-  background: pink;
-} */
 
+.currentNotifications{
+  background-color: #fde6e8 !important;
+}
 </style>
