@@ -3,16 +3,9 @@
     <q-header elevated>
       <q-toolbar>
         <q-toolbar-title>
-          Orquidário Recanto das Flores
+          <!-- <img src="../statics/logo_site.png" style="width: 100%" class="q-mt-sm" /> -->
+          LOGO DO SITE BRANCA
         </q-toolbar-title>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="rightDrawerOpen = !rightDrawerOpen"
-        />
       </q-toolbar>
     </q-header>
 
@@ -60,7 +53,6 @@ export default {
       opcoesMenu: [
         {
           title: 'Adicionar Notificação',
-          // caption: '',
           icon: 'add_alert',
           link: '#'
         }
@@ -106,8 +98,8 @@ export default {
 }
 </script>
 
-<style lang="stylus">
+<style>
 .q-header{
-  background-color: #DE781F;
+  background-color: #064319;
 }
 </style>

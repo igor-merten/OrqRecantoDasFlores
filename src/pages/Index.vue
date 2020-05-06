@@ -1,6 +1,6 @@
 <template>
   <q-page padding>
-    <div>
+    <div v-if="!addNotificationPage">
       <div class="row">
         <div class="col row notification noNotification" v-if="notificationsInDay == 0">
           <p class="col-4 iconNotification">
@@ -38,57 +38,69 @@
           </div>
         </div>
       </div>
-    <div>
-    </div>
       <q-card>
         <q-card-section class="row">
           <div class="col-12 text-h6">Proximas ações:</div>
-          <div class="cardsNextAction">
+          <div class="cardsNextAction col-12">
             <NextAction
               v-for="notification in this.nextAction()"
               :key="notification.id"
               v-bind="notification"
               actionBtn="Cancelar lembrete"
-              @click:actionBtn="alertar()"
             />
             <div style="margin: 0px; padding: 0px" v-if="this.nextAction().length == 0">
               <p style="margin-top: 10px; margin-bottom: 5px">
                 Você não possui nenhum lembrete cadastrado.
               </p>
-              <p>
-                Deseja <a href="#">cadastrar um</a>?
-              </p>
             </div>
           </div>
         </q-card-section>
       </q-card>
+      <div class="row full-width center" align="center">
+        <q-btn
+          id="btnAddNotification"
+          outline rounded
+          @click="addNotificationPage = !addNotificationPage"
+          class="full-width q-my-md q-py-sm"
+          label="Adicionar Notificação" />
+      </div>
     </div>
-    <!-- <button @click="setNotificationsLS()">teste</button> -->
+    <div v-else>
+      <AddNotification
+        @cancelButtonClicked="cancelAdd"
+        @submited="setNotificationsLS"
+      ></AddNotification>
+    </div>
   </q-page>
 </template>
 
 <script>
 import NextAction from 'components/NextAction'
-import AddNotificationModal from 'components/AddNotificationModal'
+import AddNotification from 'components/AddNotification'
 import { LocalStorage } from 'quasar'
 
 export default {
+  name: 'Index',
   components: {
     NextAction,
-    // eslint-disable-next-line vue/no-unused-components
-    AddNotificationModal
+    AddNotification
   },
   data () {
-    // var today = Date.now()
-    // console.log(this.allNotificationsDay())
     return {
-      notificationsInDay: this.allNotificationsDay().length
+      notificationsInDay: this.allNotificationsDay().length,
+      addNotificationPage: false
     }
   },
+  prop: {
+    addNotificationPage: Boolean
+  },
   methods: {
+    cancelAdd (val) {
+      this.toggleAddNotificationPage()
+    },
     allNotificationsDay () {
       var array = []
-      var notifications = this.getNotificationsLS()
+      var notifications = this.getAllNotificationsLS()
 
       for (var i = 0; i < notifications.length; i++) {
         if (notifications[i].date === '26/05/2020') {
@@ -101,8 +113,7 @@ export default {
 
     nextAction () {
       var array = []
-      var notifications = this.getNotificationsLS()
-      // var loops = notifications.length < 3 ? notifications.length : 3
+      var notifications = this.getAllNotificationsLS()
 
       for (var i = 0; i < notifications.length; i++) {
         if (notifications[i].date !== '26/05/2020') {
@@ -117,27 +128,26 @@ export default {
     },
 
     setNotificationsLS: function (value) {
-      value = {
-        id: 2,
-        title: 'Adubação',
-        caption: 'É preciso adubar as Cattleyas com Basacote.',
-        date: '26/05/2020'
-      }
       var key = 'notification'
-      var allValues = this.getNotificationsLS()
+      var id = 0
+      var allValues = this.getAllNotificationsLS()
+      if (allValues.length !== 0) {
+        id = allValues[allValues.length - 1].id + 1
+      }
+      value.id = id
       allValues.push(value)
       LocalStorage.set(key, allValues)
+      this.toggleAddNotificationPage()
     },
-    getNotificationsLS: function () {
+    getAllNotificationsLS: function () {
       var key = 'notification'
       if (!LocalStorage.getItem(key) || LocalStorage.getItem(key) == null) {
         LocalStorage.set(key, [])
       }
-      // console.log(LocalStorage.getItem(key))
       return LocalStorage.getItem(key)
     },
-    alertar: function () {
-      console.log('teste')
+    toggleAddNotificationPage: function () {
+      this.addNotificationPage = !this.addNotificationPage
     }
   },
   mounted () {
@@ -193,5 +203,14 @@ export default {
 
 .currentNotifications{
   background-color: #fde6e8 !important;
+}
+
+#btnAddNotification{
+  color: #064319 !important
+}
+
+#linkAddNotification{
+  text-decoration: none;
+  color: #064319
 }
 </style>
