@@ -62,6 +62,7 @@
           outline rounded
           @click="addNotificationPage = !addNotificationPage"
           class="full-width q-my-md q-py-sm"
+          color="primary"
           label="Adicionar Notificação" />
       </div>
     </div>
@@ -98,6 +99,7 @@ export default {
     cancelAdd (val) {
       this.toggleAddNotificationPage()
     },
+
     allNotificationsDay () {
       var array = []
       var notifications = this.getAllNotificationsLS()
@@ -137,7 +139,7 @@ export default {
       value.id = id
       allValues.push(value)
       LocalStorage.set(key, allValues)
-      this.toggleAddNotificationPage()
+      location.reload()
     },
     getAllNotificationsLS: function () {
       var key = 'notification'
@@ -205,12 +207,4 @@ export default {
   background-color: #fde6e8 !important;
 }
 
-#btnAddNotification{
-  color: #064319 !important
-}
-
-#linkAddNotification{
-  text-decoration: none;
-  color: #064319
-}
 </style>

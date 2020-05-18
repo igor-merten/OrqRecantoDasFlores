@@ -1,10 +1,10 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+    <q-header elevated color="primary">
       <q-toolbar>
         <q-toolbar-title>
-          <!-- <img src="../statics/logo_site.png" style="width: 100%" class="q-mt-sm" /> -->
-          LOGO DO SITE BRANCA
+          <img src="../statics/logo.png" style="width: 20%" class="q-mt-sm" />
+          <!-- LOGO DO SITE BRANCA -->
         </q-toolbar-title>
       </q-toolbar>
     </q-header>
@@ -39,6 +39,13 @@
 
 <script>
 import Menu from 'components/Menu'
+import { colors } from 'quasar'
+
+const { lighten, setBrand } = colors
+
+const newPrimaryColor = '#064319'
+setBrand('primary', newPrimaryColor)
+setBrand('primary-darkened', lighten(newPrimaryColor, -10))
 
 export default {
   name: 'MainLayout',
@@ -99,7 +106,4 @@ export default {
 </script>
 
 <style>
-.q-header{
-  background-color: #064319;
-}
 </style>

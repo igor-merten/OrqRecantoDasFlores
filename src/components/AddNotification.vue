@@ -14,6 +14,7 @@
           v-model="title"
           type="text"
           label="Titulo *"
+          color="primary"
           lazy-rules
           :rules="[ val => val && val.length > 0 || 'Por favor, digite o título']"
         />
@@ -23,6 +24,7 @@
           style="padding-bottom: 0px; margin-top: 0px"
           mask="##/##/####"
           label="Data *"
+          color="primary"
           lazy-rules
           :rules="[checkDate]"
         >
@@ -35,19 +37,92 @@
           </template>
         </q-input>
 
-        <q-select filled v-model="frequency" :options="options" label="Frequência">
-        </q-select>
+        <!-- <q-select filled v-model="frequency" :options="options" label="Frequência">
+        </q-select> -->
+
+        <div class="row">
+          <p class="col vertical-middle fontSize18" style="padding: 11px 0px; margin: 0px">Repetir esse lembrete?</p>
+          <span align="right" class="col">
+            <q-toggle
+              v-model="repetir"
+            ></q-toggle>
+          </span>
+        </div>
+
+        <div style="margin-top: 0px" v-show="repetir">
+          <div class="row">
+            <p class="col vertical-middle" style="padding: 19px 0px; margin: 0px">
+              A cada
+            </p>
+            <div class="q-mr-sm">
+              <q-input
+                @keydown="pluralOptions()"
+                v-model="qntTimes"
+                style="width: 50px"
+                type="number"
+                mask="#"
+                fill-mask="1"
+                filled
+                reverse-fill-mask
+                input-class="text-center"
+              />
+            </div>
+            <div class="col">
+              <q-select
+                v-model="frequency"
+                filled
+                :options="options"
+                emit-value
+                map-options
+                option-value="options.id"
+              />
+            </div>
+          </div>
+          <div>
+            <div class="row">
+              <p class="col vertical-middle fontSize18" style="padding: 11px 0px; margin: 0px">
+                Terminar?
+              </p>
+              <span align="right" class="col">
+                <q-toggle
+                  v-model="terminar"
+                ></q-toggle>
+              </span>
+            </div>
+            <div class="row gutter" v-show="terminar">
+              <p class="col vertical-middle" style="padding: 19px 0px; margin: 0px">
+                Terminar em
+              </p>
+              <div class="q-mr-sm">
+                <q-input
+                  v-model="qntTimes"
+                  style="width: 50px"
+                  type="number"
+                  mask="#"
+                  fill-mask="1"
+                  filled
+                  reverse-fill-mask
+                  input-class="text-center"
+                />
+              </div>
+              <div class="col">
+                <q-select v-model="frequency" filled :options="options" />
+              </div>
+            </div>
+          </div>
+        </div>
 
         <q-input
           filled
           v-model="caption"
           type="text"
           label="Legenda"
+          color="primary"
         />
 
         <div>
           <q-btn label="Cadastrar" class="btnSubmit" type="submit" color="primary"/>
-          <q-btn label="Cancelar" @click="cancel()" type="reset" flat class="q-ml-sm btnCancel" />
+          <q-btn label="Cancelar" @click="cancel()" type="reset" flat color="primary" class="q-ml-sm btnCancel" />
         </div>
       </q-form>
     </q-card-section>
@@ -64,13 +139,19 @@ export default {
   },
   data () {
     return {
-      options: [
-        '', 'Semanalmente', 'Mensalmente'
-      ],
       title: '',
       date: '',
       caption: '',
-      frequency: null
+      qntTimes: 1,
+      options: [
+        { id: 0, value: 'dia' },
+        { id: 1, value: 'semana' },
+        { id: 2, value: 'mês' },
+        { id: 3, value: 'ano' }
+      ],
+      frequency: 'dia',
+      repetir: false,
+      terminar: false
     }
   },
   methods: {
@@ -103,9 +184,15 @@ export default {
         val.slice(3, 5) > 12 ||
         val.slice(3, 5) <= 0 ||
         val.slice(6) < 2020) {
-        return 'Por favor, digite um data válida.'
+        return 'Por favor, digite uma data válida.'
       }
       return true
+    },
+
+    pluralOptions () {
+      console.log(this.qntTimes)
+      this.options = this.qntTimes === '1' ? ['dia', 'semana', 'mês', 'ano'] : ['dias', 'semanas', 'meses', 'anos']
+      console.log(this.options[0])
     }
   }
 }
@@ -115,17 +202,20 @@ export default {
 label{
   padding: 0px
 }
-.btnSubmit{
+/* .btnSubmit{
   background-color: #064319 !important
 }
 .btnCancel{
   color: #064319 !important
 }
-/* fundo header calendario e dia selecionado */
+/* fundo header calendario e dia selecionado
 .q-date__header, .q-btn--unelevated{
   background-color: #064319 !important
 }
 .q-field--focused .q-field__control{
   color: #064319
+} */
+.fontSize18{
+  font-size: 18;
 }
 </style>
