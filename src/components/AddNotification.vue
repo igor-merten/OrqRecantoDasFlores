@@ -1,14 +1,18 @@
 <template>
-  <q-card bordered class="col my-card bg-grey-1 q-px-sm q-pb-sm">
+
+<q-form
+  @submit="onSubmit"
+  class="q-gutter-md"
+  >
+
+  <transition name="fade" mode="out-in">
+
+  <q-card bordered class="col my-card bg-grey-1 q-px-sm q-pb-sm" v-if="addNotificationPosition === 0" key="Titulo">
     <q-card-section>
-      <div class="text-h6">Adicionar Notificação</div>
+      <div class="text-h6">Qual título deve ter a notificação?</div>
     </q-card-section>
 
     <q-card-section>
-      <q-form
-        @submit="onSubmit"
-        class="q-gutter-md"
-      >
         <q-input
           filled
           v-model="title"
@@ -18,45 +22,107 @@
           lazy-rules
           :rules="[ val => val && val.length > 0 || 'Por favor, digite o título']"
         />
+    </q-card-section>
 
-        <q-input filled
-          v-model="date"
-          style="padding-bottom: 0px; margin-top: 0px"
-          mask="##/##/####"
-          label="Data *"
-          color="primary"
-          lazy-rules
-          :rules="[checkDate]"
-        >
-          <template v-slot:append>
-            <q-icon name="event">
-              <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
-                <q-date v-model="date" mask="DD/MM/YYYY" subtitle="Data" @input="() => $refs.qDateProxy.hide()" />
-              </q-popup-proxy>
-            </q-icon>
-          </template>
-        </q-input>
+    <div>
+      <q-btn label="Cancelar" @click="cancel()" type="reset" color="primary" class="q-ml-sm btnCancel" />
+      <q-btn label="Seguinte >" class="btnSubmit" type="button" flat @click="addNotificationPositionChange(1)" color="primary"/>
+    </div>
 
-        <!-- <q-select filled v-model="frequency" :options="options" label="Frequência">
-        </q-select> -->
+  </q-card>
 
+  <q-card bordered class="col my-card bg-grey-1 q-px-sm q-pb-sm" v-if="addNotificationPosition === 1" key="Data">
+    <q-card-section>
+      <div class="text-h6">Quando você quer ser notificado?</div>
+    </q-card-section>
+      <q-card-section>
+          <q-input filled
+            v-model="date"
+            style="padding-bottom: 0px; margin-top: 0px"
+            mask="##/##/####"
+            label="Data *"
+            color="primary"
+            lazy-rules
+            :rules="[checkDate]"
+          >
+            <template v-slot:append>
+              <q-icon name="event">
+                <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
+                  <q-date v-model="date" mask="DD/MM/YYYY" subtitle="Data" @input="() => $refs.qDateProxy.hide()" />
+                </q-popup-proxy>
+              </q-icon>
+            </template>
+          </q-input>
+    </q-card-section>
+
+    <div>
+      <q-btn label="< Voltar" @click="addNotificationPositionChange(-1)" type="button" flat color="primary" class="q-ml-sm btnCancel" />
+      <q-btn label="Seguinte >" class="btnSubmit" type="button" @click="addNotificationPositionChange(1)" flat color="primary"/>
+    </div>
+
+  </q-card>
+
+  <q-card bordered class="col my-card bg-grey-1 q-px-sm q-pb-sm" v-if="addNotificationPosition === 2" key="Repetir">
+    <q-card-section>
+      <div class="text-h6">Você quer que esse lembrete se repita?</div>
+    </q-card-section>
+
+    <q-card-section>
+      <div class="row">
+        <p class="col vertical-middle fontSize18" style="padding: 11px 0px; margin: 0px">Repetir esse lembrete?</p>
+        <span align="right" class="col">
+          <q-toggle
+            v-model="repetir"
+          ></q-toggle>
+        </span>
+      </div>
+
+      <div style="margin-top: 0px" v-show="repetir">
         <div class="row">
-          <p class="col vertical-middle fontSize18" style="padding: 11px 0px; margin: 0px">Repetir esse lembrete?</p>
-          <span align="right" class="col">
-            <q-toggle
-              v-model="repetir"
-            ></q-toggle>
-          </span>
+          <p class="col vertical-middle" style="padding: 19px 0px; margin: 0px">
+            A cada
+          </p>
+          <div class="q-mr-sm">
+            <q-input
+              @keydown="pluralOptions()"
+              v-model="qntTimes"
+              style="width: 50px"
+              type="number"
+              mask="#"
+              fill-mask="1"
+              filled
+              reverse-fill-mask
+              input-class="text-center"
+            />
+          </div>
+          <div class="col">
+            <q-select
+              v-model="frequency"
+              filled
+              :options="options"
+              emit-value
+              map-options
+              option-value="options.id"
+            />
+          </div>
         </div>
-
-        <div style="margin-top: 0px" v-show="repetir">
+        <div>
           <div class="row">
+            <p class="col vertical-middle fontSize18" style="padding: 11px 0px; margin: 0px">
+              Terminar?
+            </p>
+            <span align="right" class="col">
+              <q-toggle
+                v-model="terminar"
+              ></q-toggle>
+            </span>
+          </div>
+          <div class="row gutter" v-show="terminar">
             <p class="col vertical-middle" style="padding: 19px 0px; margin: 0px">
-              A cada
+              Terminar em
             </p>
             <div class="q-mr-sm">
               <q-input
-                @keydown="pluralOptions()"
                 v-model="qntTimes"
                 style="width: 50px"
                 type="number"
@@ -68,65 +134,45 @@
               />
             </div>
             <div class="col">
-              <q-select
-                v-model="frequency"
-                filled
-                :options="options"
-                emit-value
-                map-options
-                option-value="options.id"
-              />
-            </div>
-          </div>
-          <div>
-            <div class="row">
-              <p class="col vertical-middle fontSize18" style="padding: 11px 0px; margin: 0px">
-                Terminar?
-              </p>
-              <span align="right" class="col">
-                <q-toggle
-                  v-model="terminar"
-                ></q-toggle>
-              </span>
-            </div>
-            <div class="row gutter" v-show="terminar">
-              <p class="col vertical-middle" style="padding: 19px 0px; margin: 0px">
-                Terminar em
-              </p>
-              <div class="q-mr-sm">
-                <q-input
-                  v-model="qntTimes"
-                  style="width: 50px"
-                  type="number"
-                  mask="#"
-                  fill-mask="1"
-                  filled
-                  reverse-fill-mask
-                  input-class="text-center"
-                />
-              </div>
-              <div class="col">
-                <q-select v-model="frequency" filled :options="options" />
-              </div>
+              <q-select v-model="frequency" filled :options="options" />
             </div>
           </div>
         </div>
+      </div>
+    </q-card-section>
 
-        <q-input
-          filled
-          v-model="caption"
-          type="text"
-          label="Legenda"
-          color="primary"
-        />
+    <div>
+      <q-btn label="< Voltar" @click="addNotificationPositionChange(-1)" type="button" flat color="primary" class="q-ml-sm btnCancel" />
+      <q-btn label="Seguinte >" class="btnSubmit" type="button" @click="addNotificationPositionChange(1)" flat color="primary"/>
+    </div>
 
-        <div>
-          <q-btn label="Cadastrar" class="btnSubmit" type="submit" color="primary"/>
-          <q-btn label="Cancelar" @click="cancel()" type="reset" flat color="primary" class="q-ml-sm btnCancel" />
-        </div>
-      </q-form>
+  </q-card>
+
+  <q-card bordered class="col my-card bg-grey-1 q-px-sm q-pb-sm" v-if="addNotificationPosition === 3" key="Legenda">
+    <q-card-section>
+      <div class="text-h6">Deseja colocar alguma legenda na notificação?</div>
+    </q-card-section>
+
+    <q-card-section>
+      <q-input
+        filled
+        v-model="caption"
+        type="text"
+        label="Legenda"
+        color="primary"
+      />
+
+      <div>
+        <q-btn label="< Voltar" @click="addNotificationPositionChange(-1)" type="button" flat color="primary" class="q-ml-sm btnCancel" />
+        <q-btn label="Cadastrar" class="btnSubmit" type="submit" color="primary"/>
+      </div>
     </q-card-section>
   </q-card>
+  </transition>
+
+        <!-- <q-select filled v-model="frequency" :options="options" label="Frequência">
+        </q-select> -->
+  </q-form>
 </template>
 
 <script>
@@ -139,6 +185,7 @@ export default {
   },
   data () {
     return {
+      addNotificationPosition: 0,
       title: '',
       date: '',
       caption: '',
@@ -155,6 +202,19 @@ export default {
     }
   },
   methods: {
+    addNotificationPositionChange (value) {
+      this.addNotificationPosition += value
+      if (this.addNotificationPosition < 0 || this.addNotificationPosition > 3) {
+        this.addNotificationPosition = 0
+      }
+      switch (this.addNotificationPosition) {
+        case 0: return 'Titulo'
+        case 1: return 'Data'
+        case 2: return 'Repetir'
+        case 3: return 'Legenda'
+        default: return 'Titulo'
+      }
+    },
     cancel () {
       this.$emit('cancelButtonClicked')
     },
@@ -217,5 +277,11 @@ label{
 } */
 .fontSize18{
   font-size: 18;
+}
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .3s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 </style>
