@@ -1,68 +1,83 @@
 <template>
 
-<q-form
-  @submit="onSubmit"
-  class="q-gutter-md"
-  >
-
   <transition name="fade" mode="out-in">
 
-  <q-card bordered class="col my-card bg-grey-1 q-px-sm q-pb-sm" v-if="addNotificationPosition === 0" key="Titulo">
-    <q-card-section>
-      <div class="text-h6">Qual título deve ter a notificação?</div>
-    </q-card-section>
+  <q-form
+    @submit.prevent="addNotificationPositionChange(1)"
+    class="q-gutter-md"
+    v-if="addNotificationPosition === 0"
+    key="Titulo"
+    >
 
-    <q-card-section>
-        <q-input
-          filled
-          v-model="title"
-          type="text"
-          label="Titulo *"
-          color="primary"
-          lazy-rules
-          :rules="[ val => val && val.length > 0 || 'Por favor, digite o título']"
-        />
-    </q-card-section>
-
-    <div>
-      <q-btn label="Cancelar" @click="cancel()" type="reset" color="primary" class="q-ml-sm btnCancel" />
-      <q-btn label="Seguinte >" class="btnSubmit" type="button" flat @click="addNotificationPositionChange(1)" color="primary"/>
-    </div>
-
-  </q-card>
-
-  <q-card bordered class="col my-card bg-grey-1 q-px-sm q-pb-sm" v-if="addNotificationPosition === 1" key="Data">
-    <q-card-section>
-      <div class="text-h6">Quando você quer ser notificado?</div>
-    </q-card-section>
+    <q-card bordered class="col my-card bg-grey-1 q-px-sm q-pb-sm">
       <q-card-section>
-          <q-input filled
-            v-model="date"
-            style="padding-bottom: 0px; margin-top: 0px"
-            mask="##/##/####"
-            label="Data *"
+        <div class="text-h6">Qual título deve ter a notificação?</div>
+      </q-card-section>
+
+      <q-card-section>
+          <q-input
+            filled
+            v-model="title"
+            type="text"
+            label="Titulo *"
             color="primary"
             lazy-rules
-            :rules="[checkDate]"
-          >
-            <template v-slot:append>
-              <q-icon name="event">
-                <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
-                  <q-date v-model="date" mask="DD/MM/YYYY" subtitle="Data" @input="() => $refs.qDateProxy.hide()" />
-                </q-popup-proxy>
-              </q-icon>
-            </template>
-          </q-input>
-    </q-card-section>
+            :rules="[ val => val && val.length > 0 || 'Por favor, digite o título']"
+          />
+      </q-card-section>
 
-    <div>
-      <q-btn label="< Voltar" @click="addNotificationPositionChange(-1)" type="button" flat color="primary" class="q-ml-sm btnCancel" />
-      <q-btn label="Seguinte >" class="btnSubmit" type="button" @click="addNotificationPositionChange(1)" flat color="primary"/>
-    </div>
+      <div>
+        <q-btn label="Cancelar" @click="cancel()" type="reset" color="primary" class="q-ml-sm btnCancel" />
+        <q-btn label="Seguinte >" class="btnSubmit" type="submit" flat color="primary"/>
+      </div>
+    </q-card>
+  </q-form>
 
-  </q-card>
+  <q-form
+    @submit.prevent="addNotificationPositionChange(1)"
+    class="q-gutter-md"
+    v-if="addNotificationPosition === 1"
+    key="Data"
+    >
+    <q-card bordered class="col my-card bg-grey-1 q-px-sm q-pb-sm">
+      <q-card-section>
+        <div class="text-h6">Quando você quer ser notificado?</div>
+      </q-card-section>
+        <q-card-section>
+            <q-input filled
+              v-model="date"
+              style="padding-bottom: 0px; margin-top: 0px"
+              mask="##/##/####"
+              label="Data *"
+              color="primary"
+              lazy-rules
+              :rules="[checkDate]"
+            >
+              <template v-slot:append>
+                <q-icon name="event">
+                  <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
+                    <q-date v-model="date" mask="DD/MM/YYYY" subtitle="Data" @input="() => $refs.qDateProxy.hide()" />
+                  </q-popup-proxy>
+                </q-icon>
+              </template>
+            </q-input>
+      </q-card-section>
 
-  <q-card bordered class="col my-card bg-grey-1 q-px-sm q-pb-sm" v-if="addNotificationPosition === 2" key="Repetir">
+      <div>
+        <q-btn label="< Voltar" @click="addNotificationPositionChange(-1)" type="button" flat color="primary" class="q-ml-sm btnCancel" />
+        <q-btn label="Seguinte >" class="btnSubmit" type="submit" flat color="primary"/>
+      </div>
+
+    </q-card>
+  </q-form>
+
+<q-form
+    @submit.prevent="addNotificationPositionChange(1)"
+    class="q-gutter-md"
+    v-if="addNotificationPosition === 2"
+    key="Repetir"
+    >
+  <q-card bordered class="col my-card bg-grey-1 q-px-sm q-pb-sm">
     <q-card-section>
       <div class="text-h6">Você quer que esse lembrete se repita?</div>
     </q-card-section>
@@ -147,8 +162,15 @@
     </div>
 
   </q-card>
+</q-form>
 
-  <q-card bordered class="col my-card bg-grey-1 q-px-sm q-pb-sm" v-if="addNotificationPosition === 3" key="Legenda">
+  <q-form
+    @submit.prevent="onSubmit"
+    class="q-gutter-md"
+    v-if="addNotificationPosition === 3"
+    key="Legenda"
+    >
+  <q-card bordered class="col my-card bg-grey-1 q-px-sm q-pb-sm">
     <q-card-section>
       <div class="text-h6">Deseja colocar alguma legenda na notificação?</div>
     </q-card-section>
@@ -168,11 +190,8 @@
       </div>
     </q-card-section>
   </q-card>
-  </transition>
-
-        <!-- <q-select filled v-model="frequency" :options="options" label="Frequência">
-        </q-select> -->
   </q-form>
+  </transition>
 </template>
 
 <script>
@@ -202,7 +221,7 @@ export default {
     }
   },
   methods: {
-    addNotificationPositionChange (value) {
+    addNotificationPositionChange: function (value) {
       this.addNotificationPosition += value
       if (this.addNotificationPosition < 0 || this.addNotificationPosition > 3) {
         this.addNotificationPosition = 0
